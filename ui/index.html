@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>x-radiolist</title>
+        
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            .radio-list-container {
+                position: absolute;
+                top: 40%;
+                right: 1%;
+                transform: translateY(-50%);
+                padding: 0.625vw 0.833vw;
+                min-width: 2vw;
+                border-radius: 0.208vw;
+                display: none;
+            }
+            
+            #radio-list-header {
+                color: #ffffff;
+                font-size: 0.85vw;
+                font-weight: 600;
+                margin-bottom: 0.417vw;
+                padding-bottom: 0.313vw;
+                border-bottom: 0.052vw solid rgba(255, 255, 255, 0.2);
+                text-decoration: none !important;
+                letter-spacing: 0.026vw;
+            }
+
+            #radio-list-header::before {
+                /* content: "▶ "; */
+                margin-right: 0.208vw;
+            }
+
+            .radio-list-container > div:not(#radio-list-header) {
+                color: rgba(255, 255, 255, 0.85);
+                font-size: 0.75vw;
+                font-weight: 600;
+                padding: 0.208vw 0 0.208vw 0.521vw;
+                text-align: left;
+                line-height: 1.4;
+                margin-left: -0.05vw;
+                border-left: 0.156vw solid rgba(255, 255, 255, 0.3);
+                margin-bottom: 0.104vw;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0.521vw;
+            }
+
+            .radio-list-container > div:not(#radio-list-header) .player-id {
+                margin-left: auto;
+                color: rgba(255, 255, 255, 0.5);
+                font-size: 0.7vw;
+            }
+            
+            .talking {
+                background-color: #6d6d6d3a !important;
+                color: rgb(153, 0, 255) !important;
+                font-weight: 600;
+                animation: pulse-bg 0.8s ease-in-out infinite;
+            }
+
+            @keyframes pulse-bg {
+                0%, 100% { background-color: #6d6d6d3a; }
+                50% { background-color: #6d6d6d1e; }
+            }
+
+            .talking .player-id {
+                color: rgba(157, 11, 255, 0.7) !important;
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+        </style>
+        <script type="text/javascript">
+            window.addEventListener("message", function(event) {
+                var item = event.data;
+
+                if (item.radioId != null) {
+                    let radioListElem = document.getElementById("radio-list");
+
+                    if (!radioListElem.firstChild) { //add radio list header
+                        let listHeader = document.createElement("div");
+
+                        listHeader.id = "radio-list-header";
+                        listHeader.textContent = "Radio " + item.channel;
+
+                        radioListElem.appendChild(listHeader);
+                        radioListElem.style.display = "block"; // Show the container when header is added
+                    }
+
+                    if (item.radioName != null) {
+                        let listItem = document.createElement("div");
+                        listItem.id = "radio-list-item-" + item.radioId;
+                        
+                        // Parse the radio name to separate name and ID
+                        let radioText = item.radioName;
+                        let nameSpan = document.createElement("span");
+                        let idSpan = document.createElement("span");
+                        idSpan.className = "player-id";
+                        
+                        // Check if there's a player ID in parentheses at the end
+                        let match = radioText.match(/^(.+?)\s*\((\d+)\)?\s*$/);
+                        if (match) {
+                            nameSpan.textContent = match[1].trim();
+                            idSpan.textContent = "(" + match[2] + ")";
+                        } else {
+                            nameSpan.textContent = radioText;
+                        }
+                        
+                        listItem.appendChild(nameSpan);
+                        if (idSpan.textContent) {
+                            listItem.appendChild(idSpan);
+                        }
+
+                        radioListElem.appendChild(listItem);
+                    } else if (item.radioTalking != null) {
+                        let listItem = document.getElementById("radio-list-item-" + item.radioId)
+                        
+                        if (item.radioTalking) {
+                            listItem.className = "talking"
+                        } else {
+                            listItem.className = ""
+                        }
+                    } else {
+                        let listItem = document.getElementById("radio-list-item-" + item.radioId)
+                        radioListElem.removeChild(listItem);
+                    }
+                }
+
+                if (item.clearRadioList) {
+                    let radioListElem = document.getElementById("radio-list");
+
+                    while (radioListElem.firstChild) {
+                        radioListElem.removeChild(radioListElem.firstChild);
+                    }
+                    radioListElem.style.display = "none"; // Hide when cleared
+                }
+                
+                if (item.changeVisibility) {
+                    if (item.visible == true) {
+                        document.getElementById("radio-list").style.display = "block";
+                    } else if (item.visible == false) {
+                        document.getElementById("radio-list").style.display = "none";
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <div class="radio-list-container" id="radio-list"></div>
+    </body>
+</html>
