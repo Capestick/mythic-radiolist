@@ -149,41 +149,35 @@ function CreateFullRadioListOfChannel(RadioChannel, currentPlayer)
 end
 
 function GetPlayerNameForRadio(source)
-	if Config.LetPlayersSetTheirOwnNameInRadio then
-		local playerIdentifier = GetIdentifier(source)
-		if CustomNames[playerIdentifier] and CustomNames[playerIdentifier] ~= nil then
-			return CustomNames[playerIdentifier]
-		end
-	end
-	
-	if Config.UseRPName then	
-		local name = nil
-		if Framework == 'Mythic' then
-			
-			if Fetch then
-				local character = Fetch:Source(source):GetData('Character')
-				if character then
-					local fullName = character:GetData('Name')
-					local first = character:GetData('First')
-					local last = character:GetData('Last')
-					
-					if fullName and fullName ~= '' then
-						name = fullName
-					elseif first and last then
-						name = first .. ' ' .. last
-					elseif first then
-						name = first
-					end
-				end
-			end
-		end	
-		if name == nil then 
-			name = GetPlayerName(source)
-		end
-		return name
-	else
-		return GetPlayerName(source)
-	end
+    if Config.LetPlayersSetTheirOwnNameInRadio then
+        local playerIdentifier = GetIdentifier(source)
+        if CustomNames[playerIdentifier] and CustomNames[playerIdentifier] ~= nil then
+            return CustomNames[playerIdentifier]
+        end
+    end
+    
+    if Config.UseRPName then    
+        local name = nil
+        if Framework == 'Mythic' then
+            
+            if Fetch then
+                local character = Fetch:Source(source):GetData('Character')
+                if character then
+                    local first = character:GetData('First')
+                    local last = character:GetData('Last')
+                    
+                    if first and last then
+                        name = first .. ' ' .. last
+                    elseif first then
+                        name = first
+                    end
+                end
+            end
+        end    
+        return name
+    else
+        return GetPlayerName(source)
+    end
 end
 
 if Config.LetPlayersSetTheirOwnNameInRadio then
